@@ -51,13 +51,12 @@ def init_db():
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS transactions(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        date TEXT,
-        type TEXT,
-        category TEXT,
-        amount REAL,
-        
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    date TEXT,
+    type TEXT,
+    category TEXT,
+    amount REAL
     )
     """)
 
@@ -286,10 +285,9 @@ def add():
             date,
             type,
             category,
-            amount,
-            
+            amount
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?)
         """,
         (
             current_user.id,
@@ -304,52 +302,6 @@ def add():
     conn.close()
 
     return redirect("/")
-
-@app.route("/yearly_report")
-@login_required
-def yearly_report():
-
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT
-
-            substr(date,1,4) as year,
-
-            SUM(
-                CASE
-                WHEN type='Income'
-                THEN amount
-                ELSE 0
-                END
-            ) as income,
-
-            SUM(
-                CASE
-                WHEN type='Expense'
-                THEN amount
-                ELSE 0
-                END
-            ) as expense
-
-        FROM transactions
-
-        WHERE user_id=?
-
-        GROUP BY year
-
-        ORDER BY year DESC
-    """, (current_user.id,))
-
-    reports = cursor.fetchall()
-
-    conn.close()
-
-    return render_template(
-        "yearly_report.html",
-        reports=reports
-    )
 
 
 # --------------------------
@@ -401,7 +353,7 @@ def search():
         WHERE user_id=?
         AND (
             category LIKE ?
-            
+            OR description LIKE ?
         )
         ORDER BY id DESC
         """,
@@ -433,7 +385,7 @@ def export_excel():
         type,
         category,
         amount,
-        
+        description
         FROM transactions
         WHERE user_id=?
     """
@@ -457,139 +409,13 @@ def export_excel():
         file_name,
         as_attachment=True
     )
-@app.route("/monthly_report")
-@login_required
-def monthly_report():
-
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT
-        substr(date,1,7) as month,
-
-        SUM(
-            CASE
-            WHEN type='Income'
-            THEN amount
-            ELSE 0
-            END
-        ),
-
-        SUM(
-            CASE
-            WHEN type='Expense'
-            THEN amount
-            ELSE 0
-            END
-        )
-
-        FROM transactions
-
-        WHERE user_id=?
-
-        GROUP BY month
-
-        ORDER BY month DESC
-    """,
-    (current_user.id,)
-    )
-
-    reports = cursor.fetchall()
-
-    conn.close()
-
-    return render_template(
-        "monthly_report.html",
-        reports=reports
-    )
-@app.route("/edit/<int:id>")
-@login_required
-def edit(id):
-
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        SELECT *
-        FROM transactions
-        WHERE id=?
-        AND user_id=?
-        """,
-        (
-            id,
-            current_user.id
-        )
-    )
-
-    transaction = cursor.fetchone()
-
-    conn.close()
-
-    if not transaction:
-        return "Transaction Not Found"
-
-    return render_template(
-        "edit.html",
-        transaction=transaction
-    )
-
-@app.route("/update/<int:id>", methods=["POST"])
-@login_required
-def update(id):
-
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        UPDATE transactions
-        SET
-            date=?,
-            type=?,
-            category=?,
-            amount=?,
-            
-        WHERE id=?
-        AND user_id=?
-        """,
-        (
-            request.form["date"],
-            request.form["type"],
-            request.form["category"],
-            request.form["amount"],
-            
-            id,
-            current_user.id
-        )
-    )
-
-    conn.commit()
-    conn.close()
-
-    return redirect("/")
-
-@app.route("/users")
-def users():
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT id, username FROM users")
-    data = cursor.fetchall()
-
-    conn.close()
-
-    return str(data)
 
 # --------------------------
 # START APP
 # --------------------------
 
 if __name__ == "__main__":
+
     init_db()
-    app.run(
-        host="0.0.0.0",
-        port=5000,
-        debug=True
-    )
+
+    app.run(debug=True)
