@@ -128,3 +128,12 @@ a:hover{
         padding:8px;
     }
 }
+.table-container{
+    width:100%;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+}
+
+table{
+    min-width:700px;
+}
