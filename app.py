@@ -351,15 +351,11 @@ def search():
         SELECT *
         FROM transactions
         WHERE user_id=?
-        AND (
-            category LIKE ?
-            OR description LIKE ?
-        )
+        AND category LIKE ?
         ORDER BY id DESC
         """,
         (
             current_user.id,
-            f"%{keyword}%",
             f"%{keyword}%"
         )
     )
@@ -384,8 +380,7 @@ def export_excel():
         date,
         type,
         category,
-        amount,
-        description
+        amount
         FROM transactions
         WHERE user_id=?
     """
