@@ -1,272 +1,130 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
 body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:20px;
     background:#f4f6f9;
-    padding:30px;
 }
-
-/* Header */
 
 h1{
     text-align:center;
-    margin-bottom:25px;
     color:#333;
 }
 
-/* Dashboard Cards */
-
-.dashboard{
+.summary{
     display:flex;
-    gap:20px;
-    margin-bottom:25px;
+    justify-content:space-around;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:20px;
 }
 
-.card{
-    flex:1;
-    padding:25px;
-    border-radius:15px;
-    color:white;
-    box-shadow:0 4px 12px rgba(0,0,0,0.1);
-    transition:0.s;
+.summary h3{
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
-
-.card:hover{
-    transform:translateY(-25px);
-}
-
-.income{
-    background:linear-gradient(135deg,#28a745,#34d058);
-}
-
-.expense{
-    background:linear-gradient(135deg,#dc3545,#ff6b6b);
-}
-
-.balance{
-    background:linear-gradient(135deg,#007bff,#4dabf7);
-}
-
-.card h2{
-    margin-bottom:10px;
-}
-
-.card h1{
-    color:white;
-}
-
-/* Form */
 
 form{
     background:white;
     padding:20px;
-    border-radius:15px;
-    margin-bottom:25px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    border-radius:10px;
+    margin-bottom:20px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
 }
 
-input,
-select{
-    width:100%;
-    padding:12px;
-    margin-top:10px;
-    margin-bottom:15px;
-    border:1px solid #ddd;
-    border-radius:8px;
-    font-size:15px;
+form input,
+form select,
+form button{
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
 }
 
-button{
-    background:#007bff;
+form button{
+    background:#28a745;
     color:white;
     border:none;
-    padding:12px 20px;
-    border-radius:15px;
     cursor:pointer;
-    font-size:15px;
 }
 
-button:hover{
-    background:#0056b3;
+form button:hover{
+    background:#218838;
 }
 
-/* Table */
+.table-container{
+    overflow-x:auto;
+}
 
 table{
     width:100%;
-    background:white;
     border-collapse:collapse;
-    border-radius:15px;
-    overflow:hidden;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    background:white;
 }
 
 th{
     background:#007bff;
     color:white;
-    padding:15px;
 }
 
-td{
+th,td{
     padding:12px;
-    border-bottom:1px solid #eee;
+    border:1px solid #ddd;
+    text-align:center;
 }
 
-tr:hover{
-    background:#f8f9fa;
+tr:nth-child(even){
+    background:#f9f9f9;
 }
-
-/* Links */
 
 a{
+    color:red;
     text-decoration:none;
-    color:#dc3545;
-    font-weight:bold;
 }
 
 a:hover{
-    color:#b02a37;
+    text-decoration:underline;
 }
 
-/* Login & Register Pages */
-
-.auth-container{
-    width:400px;
-    margin:50px auto;
-    background:white;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.1);
-}
-
-.auth-container h1{
-    margin-bottom:20px;
-}
-
-.auth-container button{
-    width:100%;
-}
-
-/* Search Bar */
-
-.search-box{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
-}
-
-.search-box input{
-    flex:1;
-}
-
-/* Responsive */
+/* MOBILE RESPONSIVE */
 
 @media(max-width:768px){
-
-    .dashboard{
-        flex-direction:column;
-    }
-
-    .auth-container{
-        width:100%;
-    }
 
     body{
-        padding:15px;
+        padding:10px;
     }
 
-}
+    h1{
+        font-size:24px;
+    }
 
-.dark-mode{
-    background:#121212;
-    color:white;
-}
-
-.dark-mode form,
-.dark-mode table,
-.dark-mode .auth-container{
-    background:#1e1e1e;
-    color:rgb(190, 190, 193);
-}
-
-.dark-mode td{
-    border-color:#444;
-}
-
-.dark-mode input,
-.dark-mode select{
-    background:#333;
-    color:white;
-    border:1px solid #555;
-}
-
-@media(max-width:768px){
-
-    .dashboard{
+    .summary{
         flex-direction:column;
+    }
+
+    .summary h3{
+        width:100%;
+        text-align:center;
+    }
+
+    form{
+        flex-direction:column;
+    }
+
+    form input,
+    form select,
+    form button{
+        width:100%;
+        box-sizing:border-box;
     }
 
     table{
         font-size:12px;
     }
 
-    input,
-    select,
-    button{
-        width:100%;
+    th,td{
+        padding:8px;
     }
-
-    body{
-        padding:10px;
-    }
-
 }
-.report-buttons{
-
-    margin-bottom:50px;
-    margin-top:50px;
-
-}
-
-.report-buttons a{
-
-    background:#007bff;
-    color:white;
-
-    padding:10px 30px;
-
-    border-radius:8px;
-
-    text-decoration:none;
-
-    margin-right:10px;
-}
-
-.report-buttons a:hover{
-
-    background:#0056b3;
-}
-a{
-
-    text-decoration:none;
-
-    padding:5px 10px;
-
-    border-radius:5px;
-}
-
-a[href*="edit"]{
-
-    background:#28a745;
-    color:white;
-}
-
-a[href*="delete"]{
-
-    background:#dc3545;
-    color:white;
-} 
