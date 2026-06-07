@@ -405,6 +405,166 @@ def export_excel():
         as_attachment=True
     )
 
+@app.route("/monthly_report")
+@login_required
+def monthly_report():
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+        substr(date,1,7) as month,
+
+        SUM(
+            CASE
+            WHEN type='Income'
+            THEN amount
+            ELSE 0
+            END
+        ) as income,
+
+        SUM(
+            CASE
+            WHEN type='Expense'
+            THEN amount
+            ELSE 0
+            END
+        ) as expense
+
+        FROM transactions
+
+        WHERE user_id=?
+
+        GROUP BY month
+
+        ORDER BY month DESC
+    """,
+    (current_user.id,)
+    )
+
+    reports = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "monthly_report.html",
+        reports=reports
+    )
+
+@app.route("/yearly_report")
+@login_required
+def yearly_report():
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+        substr(date,1,4) as year,
+
+        SUM(
+            CASE
+            WHEN type='Income'
+            THEN amount
+            ELSE 0
+            END
+        ) as income,
+
+        SUM(
+            CASE
+            WHEN type='Expense'
+            THEN amount
+            ELSE 0
+            END
+        ) as expense
+
+        FROM transactions
+
+        WHERE user_id=?
+
+        GROUP BY year
+
+        ORDER BY year DESC
+    """,
+    (current_user.id,)
+    )
+
+    reports = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "yearly_report.html",
+        reports=reports
+    )
+
+
+@app.route("/edit/<int:id>")
+@login_required
+def edit(id):
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM transactions
+        WHERE id=?
+        AND user_id=?
+        """,
+        (
+            id,
+            current_user.id
+        )
+    )
+
+    transaction = cursor.fetchone()
+
+    conn.close()
+
+    if not transaction:
+        return "Transaction Not Found"
+
+    return render_template(
+        "edit.html",
+        transaction=transaction
+    )
+
+@app.route("/update/<int:id>", methods=["POST"])
+@login_required
+def update(id):
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET
+            date=?,
+            type=?,
+            category=?,
+            amount=?
+        WHERE id=?
+        AND user_id=?
+        """,
+        (
+            request.form["date"],
+            request.form["type"],
+            request.form["category"],
+            request.form["amount"],
+            id,
+            current_user.id
+        )
+    )
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/")
+
 # --------------------------
 # START APP
 # --------------------------
