@@ -1,161 +1,162 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Expense Tracker</title>
+    <title>FinanceTrack Dashboard</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
 
+<div class="topbar">
 
+    <div class="logo">
+        💰 FinanceTrack
+    </div>
 
-<h1>Expense Tracker</h1>
+    <div class="menu">
+        <a href="/">Dashboard</a>
+        <a href="/monthly_report">Reports</a>
+        <a href="/export">Export</a>
+        <a href="/logout">Logout</a>
+    </div>
 
-<div class="summary">
-    <div class="dashboard">
-        <a href="/export">
-    Export Excel
-</a>
+    <div class="user">
+        👤 {{ username }}
+    </div>
+
+</div>
+
+<div class="cards">
 
     <div class="card income">
-        <h2>Total Income</h2>
+        <h3>Total Income</h3>
         <h1>₹{{ income }}</h1>
     </div>
 
     <div class="card expense">
-        <h2>Total Expense</h2>
+        <h3>Total Expense</h3>
         <h1>₹{{ expense }}</h1>
     </div>
 
     <div class="card balance">
-        <h2>Balance</h2>
+        <h3>Current Balance</h3>
         <h1>₹{{ balance }}</h1>
     </div>
 
 </div>
 
-<form action="/add" method="POST">
+<div class="main-grid">
 
-    <input type="date" name="date" required>
+    <div class="left-panel">
 
-    <select name="type">
-        <option>Income</option>
-        <option>Expense</option>
-    </select>
+        <h2>Add Transaction</h2>
 
-    <select name="category">
+        <form action="/add" method="POST">
 
-    <option>Salary</option>
-    <option>Business</option>
-    <option>Food</option>
-    <option>Travel</option>
-    <option>Shopping</option>
-    <option>Rent</option>
-    <option>Electricity</option>
-    <option>Internet</option>
-    <option>Entertainment</option>
-    <option>Medical</option>
-    <option>Other</option>
+            <input type="date" name="date" required>
 
-</select>
+            <select name="type">
+                <option>Income</option>
+                <option>Expense</option>
+            </select>
 
-    <input type="number"
-           step="0.01"
-           name="amount"
-           placeholder="Amount"
-           required>
+            <select name="category">
+                <option>Salary</option>
+                <option>Business</option>
+                <option>Food</option>
+                <option>Travel</option>
+                <option>Shopping</option>
+                <option>Rent</option>
+                <option>Medical</option>
+                <option>Entertainment</option>
+                <option>Other</option>
+            </select>
 
-    <input type="text"
-           name="description"
-           placeholder="Description">
+            <input
+                type="number"
+                step="0.01"
+                name="amount"
+                placeholder="Amount"
+                required
+            >
 
-    <button type="submit">
-        Add Transaction
-    </button>
+            <input
+                type="text"
+                name="description"
+                placeholder="Description"
+            >
 
-</form>
+            <button type="submit">
+                Add Transaction
+            </button>
 
-<table>
+        </form>
 
-<tr>
-    <th>Date</th>
-    <th>Type</th>
-    <th>Category</th>
-    <th>Amount</th>
-    <th>Description</th>
-    <th>Action</th>
-</tr>
+    </div>
 
-{% for t in transactions %}
-<tr>
-    <td>{{ t[1] }}</td>
-    <td>{{ t[2] }}</td>
-    <td>{{ t[3] }}</td>
-    <td>₹{{ t[4] }}</td>
-    <td>{{ t[5] }}</td>
-    <td>
-        <a href="/edit/{{ t[0] }}">
-            Edit
-        </a>
+    <div class="right-panel">
 
-        |
-        
-        <a href="/delete/{{ t[0] }}">
-            Delete
-        </a>
-    </td>
-</tr>
-{% endfor %}
+        <h2>Transaction History</h2>
 
-</table>
-<button onclick="toggleDarkMode()">
-    Toggle Dark Mode
-</button>
+        <form action="/search">
 
-<script>
-function toggleDarkMode() {
+            <input
+                type="text"
+                name="keyword"
+                placeholder="Search Transaction"
+            >
 
-    document.body.classList.toggle("dark-mode");
+        </form>
 
-    localStorage.setItem(
-        "darkMode",
-        document.body.classList.contains("dark-mode")
-    );
-}
+        <div class="table-container">
 
-if(localStorage.getItem("darkMode") === "true"){
-    document.body.classList.add("dark-mode");
-}
-</script>
+        <table>
 
-<div class="report-buttons">
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Action</th>
+            </tr>
 
-    <a href="/monthly_report">
-        Monthly Report
-    </a>
+            {% for t in transactions %}
 
-    <a href="/yearly_report">
-        Yearly Report
-    </a>
+            <tr>
+
+                <td>{{ t[2] }}</td>
+                <td>{{ t[3] }}</td>
+                <td>{{ t[4] }}</td>
+                <td>₹{{ t[5] }}</td>
+
+                <td>
+
+                    <a class="edit-btn"
+                       href="/edit/{{ t[0] }}">
+                        Edit
+                    </a>
+
+                    <a class="delete-btn"
+                       href="/delete/{{ t[0] }}">
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+        </div>
+
+    </div>
 
 </div>
 
-
-
 </body>
 </html>
-<form action="/search">
-
-<input
-type="text"
-name="keyword"
-placeholder="Search"
->
-
-<button>
-Search
-</button>
-
-</form>
-<a href="/logout">
-    Logout
-</a>
