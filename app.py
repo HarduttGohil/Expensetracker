@@ -565,6 +565,20 @@ def update(id):
 
     return redirect("/")
 
+@app.route("/users")
+def users():
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, username FROM users")
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return str(data)
+
 # --------------------------
 # START APP
 # --------------------------
