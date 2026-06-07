@@ -268,5 +268,5 @@ a[href*="edit"]{
 a[href*="delete"]{
 
     background:#dc3545;
-    color:rgb(255, 255, 255);
+    color:white;
 } 
