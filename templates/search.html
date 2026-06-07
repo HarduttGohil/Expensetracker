@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+
+<h1>Search Results</h1>
+
+<a href="/">Back</a>
+
+<table border="1">
+
+<tr>
+    <th>Date</th>
+    <th>Type</th>
+    <th>Category</th>
+    <th>Amount</th>
+    <th>Description</th>
+</tr>
+
+{% for t in transactions %}
+
+<tr>
+    <td>{{ t[2] }}</td>
+    <td>{{ t[3] }}</td>
+    <td>{{ t[4] }}</td>
+    <td>₹{{ t[5] }}</td>
+    <td>{{ t[6] }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>

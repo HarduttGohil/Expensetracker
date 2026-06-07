@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Monthly Report</title>
+
+    <link rel="stylesheet"
+          href="/static/style.css">
+
+</head>
+
+<body>
+
+<h1>Monthly Report</h1>
+
+<a href="/">Back To Dashboard</a>
+
+<br><br>
+
+<table>
+
+<tr>
+
+    <th>Month</th>
+    <th>Income</th>
+    <th>Expense</th>
+    <th>Savings</th>
+
+</tr>
+
+{% for report in reports %}
+
+<tr>
+
+    <td>{{ report[0] }}</td>
+
+    <td>
+        ₹{{ report[1] }}
+    </td>
+
+    <td>
+        ₹{{ report[2] }}
+    </td>
+
+    <td>
+        ₹{{ report[1] - report[2] }}
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>
