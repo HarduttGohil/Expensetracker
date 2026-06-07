@@ -579,6 +579,19 @@ def users():
 
     return str(data)
 
+@app.route("/debug_users")
+def debug_users():
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT username, password FROM users")
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return str(data)
+
 # --------------------------
 # START APP
 # --------------------------
