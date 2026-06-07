@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FinanceTrack Dashboard</title>
+    <title>FinanceTrack</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet"
+          href="/static/style.css">
 </head>
-
 <body>
 
 <div class="topbar">
@@ -17,14 +18,25 @@
     </div>
 
     <div class="menu">
-        <a href="/">Dashboard</a>
-        <a href="/monthly_report">Reports</a>
-        <a href="/export">Export</a>
-        <a href="/logout">Logout</a>
-    </div>
 
-    <div class="user">
-        👤 {{ username }}
+        <a href="/">Dashboard</a>
+
+        <a href="/monthly_report">
+            Monthly Report
+        </a>
+
+        <a href="/yearly_report">
+            Yearly Report
+        </a>
+
+        <a href="/export">
+            Export Excel
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
     </div>
 
 </div>
@@ -32,17 +44,17 @@
 <div class="cards">
 
     <div class="card income">
-        <h3>Total Income</h3>
+        <h2>Total Income</h2>
         <h1>₹{{ income }}</h1>
     </div>
 
     <div class="card expense">
-        <h3>Total Expense</h3>
+        <h2>Total Expense</h2>
         <h1>₹{{ expense }}</h1>
     </div>
 
     <div class="card balance">
-        <h3>Current Balance</h3>
+        <h2>Current Balance</h2>
         <h1>₹{{ balance }}</h1>
     </div>
 
@@ -50,111 +62,116 @@
 
 <div class="main-grid">
 
-    <div class="left-panel">
+<div class="left-panel">
 
-        <h2>Add Transaction</h2>
+<h2>Add Transaction</h2>
 
-        <form action="/add" method="POST">
+<form action="/add" method="POST">
 
-            <input type="date" name="date" required>
+<input type="date"
+       name="date"
+       required>
 
-            <select name="type">
-                <option>Income</option>
-                <option>Expense</option>
-            </select>
+<select name="type">
 
-            <select name="category">
-                <option>Salary</option>
-                <option>Business</option>
-                <option>Food</option>
-                <option>Travel</option>
-                <option>Shopping</option>
-                <option>Rent</option>
-                <option>Medical</option>
-                <option>Entertainment</option>
-                <option>Other</option>
-            </select>
+<option>Income</option>
+<option>Expense</option>
 
-            <input
-                type="number"
-                step="0.01"
-                name="amount"
-                placeholder="Amount"
-                required
-            >
+</select>
 
-            <input
-                type="text"
-                name="description"
-                placeholder="Description"
-            >
+<select name="category">
 
-            <button type="submit">
-                Add Transaction
-            </button>
+<option>Salary</option>
+<option>Business</option>
+<option>Food</option>
+<option>Travel</option>
+<option>Shopping</option>
+<option>Rent</option>
+<option>Medical</option>
+<option>Entertainment</option>
+<option>Other</option>
 
-        </form>
+</select>
 
-    </div>
+<input type="number"
+       step="0.01"
+       name="amount"
+       placeholder="Amount"
+       required>
 
-    <div class="right-panel">
+<input type="text"
+       name="description"
+       placeholder="Description">
 
-        <h2>Transaction History</h2>
+<button type="submit">
+Add Transaction
+</button>
 
-        <form action="/search">
+</form>
 
-            <input
-                type="text"
-                name="keyword"
-                placeholder="Search Transaction"
-            >
+</div>
 
-        </form>
+<div class="right-panel">
 
-        <div class="table-container">
+<h2>Transaction History</h2>
 
-        <table>
+<form action="/search">
 
-            <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Category</th>
-                <th>Amount</th>
-                <th>Action</th>
-            </tr>
+<input
+type="text"
+name="keyword"
+placeholder="Search transactions">
 
-            {% for t in transactions %}
+<button>
+Search
+</button>
 
-            <tr>
+</form>
 
-                <td>{{ t[2] }}</td>
-                <td>{{ t[3] }}</td>
-                <td>{{ t[4] }}</td>
-                <td>₹{{ t[5] }}</td>
+<table>
 
-                <td>
+<tr>
 
-                    <a class="edit-btn"
-                       href="/edit/{{ t[0] }}">
-                        Edit
-                    </a>
+<th>Date</th>
+<th>Type</th>
+<th>Category</th>
+<th>Amount</th>
+<th>Description</th>
+<th>Action</th>
 
-                    <a class="delete-btn"
-                       href="/delete/{{ t[0] }}">
-                        Delete
-                    </a>
+</tr>
 
-                </td>
+{% for t in transactions %}
 
-            </tr>
+<tr>
 
-            {% endfor %}
+<td>{{ t[2] }}</td>
+<td>{{ t[3] }}</td>
+<td>{{ t[4] }}</td>
+<td>₹{{ t[5] }}</td>
+<td>{{ t[6] }}</td>
 
-        </table>
+<td>
 
-        </div>
+<a class="edit-btn"
+href="/edit/{{ t[0] }}">
+Edit
+</a>
 
-    </div>
+<a class="delete-btn"
+href="/delete/{{ t[0] }}">
+Delete
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
 
 </div>
 

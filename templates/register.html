@@ -1,31 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Register</title>
-<link rel="stylesheet" href="/static/style.css">
-</head>
 
+<title>Register</title>
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet"
+href="/static/style.css">
+
+</head>
 <body>
 
 <div class="auth-box">
 
 <h1>Create Account</h1>
 
-<form action="/register_user" method="POST">
+<form action="/register_user"
+method="POST">
 
 <input type="text"
-       name="username"
-       placeholder="Username">
+name="username"
+placeholder="Username"
+required>
 
 <input type="password"
-       name="password"
-       placeholder="Password">
+name="password"
+placeholder="Password"
+required>
 
 <button>
 Register
 </button>
 
 </form>
+
+<br>
+
+<a href="/login">
+Back To Login
+</a>
 
 </div>
 
