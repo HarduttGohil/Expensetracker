@@ -57,7 +57,7 @@ def init_db():
         type TEXT,
         category TEXT,
         amount REAL,
-        description TEXT
+        
     )
     """)
 
@@ -287,7 +287,7 @@ def add():
             type,
             category,
             amount,
-            description
+            
         )
         VALUES (?, ?, ?, ?, ?, ?)
         """,
@@ -296,8 +296,7 @@ def add():
             request.form["date"],
             request.form["type"],
             request.form["category"],
-            request.form["amount"],
-            request.form["description"]
+            request.form["amount"]
         )
     )
 
@@ -402,7 +401,7 @@ def search():
         WHERE user_id=?
         AND (
             category LIKE ?
-            OR description LIKE ?
+            
         )
         ORDER BY id DESC
         """,
@@ -434,7 +433,7 @@ def export_excel():
         type,
         category,
         amount,
-        description
+        
         FROM transactions
         WHERE user_id=?
     """
@@ -551,7 +550,7 @@ def update(id):
             type=?,
             category=?,
             amount=?,
-            description=?
+            
         WHERE id=?
         AND user_id=?
         """,
@@ -560,7 +559,7 @@ def update(id):
             request.form["type"],
             request.form["category"],
             request.form["amount"],
-            request.form["description"],
+            
             id,
             current_user.id
         )
