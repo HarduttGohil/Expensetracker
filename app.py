@@ -23,7 +23,7 @@ app = Flask(__name__)
 
 app.secret_key = "my_super_secret_key"
 # Connect to Postgres via the shared transaction-mode pooler (IPv4-only)
-DATABASE_URL = "postgresql://postgres.oncthwlejeeiaanrnwme:[Expensetracker12345!]@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
+DATABASE_URL = "postgresql://postgres.oncthwlejeeiaanrnwme:Expensetracker12345!@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
 def get_connection():
     return psycopg2.connect(
     DATABASE_URL,
