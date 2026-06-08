@@ -1,7 +1,9 @@
 import pandas as pd
 from flask import send_file
 from flask import Flask, render_template, request, redirect
-import sqlite3
+import psycopg2
+import os
+
 
 from flask_login import (
     LoginManager,
@@ -20,9 +22,14 @@ from werkzeug.security import (
 app = Flask(__name__)
 
 app.secret_key = "my_super_secret_key"
+# Connect to Postgres via the shared transaction-mode pooler (IPv4-only)
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-DATABASE = "finance.db"
-
+def get_connection():
+    return psycopg2.connect(
+    DATABASE_URL,
+    sslmode="require"
+)
 # --------------------------
 # LOGIN MANAGER
 # --------------------------
@@ -38,25 +45,25 @@ login_manager.login_view = "login"
 
 def init_db():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(255) UNIQUE,
         password TEXT
     )
     """)
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS transactions(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    date TEXT,
-    type TEXT,
-    category TEXT,
-    amount REAL
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER,
+        date VARCHAR(50),
+        type VARCHAR(50),
+        category VARCHAR(255),
+        amount DECIMAL
     )
     """)
 
@@ -78,11 +85,15 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT * FROM users WHERE id=?",
+        """
+        SELECT *
+        FROM users
+        WHERE id=%s
+        """,
         (user_id,)
     )
 
@@ -91,7 +102,10 @@ def load_user(user_id):
     conn.close()
 
     if user:
-        return User(user[0], user[1])
+        return User(
+            user[0],
+            user[1]
+        )
 
     return None
 
@@ -114,7 +128,7 @@ def register_user():
         request.form["password"]
     )
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     try:
@@ -123,7 +137,7 @@ def register_user():
             """
             INSERT INTO users
             (username, password)
-            VALUES (?, ?)
+            VALUES (%s, %s)
             """,
             (
                 username,
@@ -133,7 +147,7 @@ def register_user():
 
         conn.commit()
 
-    except sqlite3.IntegrityError:
+    except psycopg2.Error:
 
         conn.close()
 
@@ -159,14 +173,14 @@ def login_user_route():
     username = request.form["username"]
     password = request.form["password"]
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
         SELECT *
         FROM users
-        WHERE username=?
+        WHERE username=%s
         """,
         (username,)
     )
@@ -213,14 +227,14 @@ def logout():
 @login_required
 def index():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
         SELECT *
         FROM transactions
-        WHERE user_id=?
+        WHERE user_id=%s
         ORDER BY id DESC
         """,
         (current_user.id,)
@@ -233,7 +247,7 @@ def index():
         SELECT COALESCE(SUM(amount),0)
         FROM transactions
         WHERE type='Income'
-        AND user_id=?
+        AND user_id=%s
         """,
         (current_user.id,)
     )
@@ -245,7 +259,7 @@ def index():
         SELECT COALESCE(SUM(amount),0)
         FROM transactions
         WHERE type='Expense'
-        AND user_id=?
+        AND user_id=%s
         """,
         (current_user.id,)
     )
@@ -274,7 +288,7 @@ def index():
 @login_required
 def add():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -287,7 +301,7 @@ def add():
             category,
             amount
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s)
         """,
         (
             current_user.id,
@@ -312,14 +326,14 @@ def add():
 @login_required
 def delete(id):
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
         DELETE FROM transactions
-        WHERE id=?
-        AND user_id=?
+        WHERE id=%s
+        AND user_id=%s
         """,
         (
             id,
@@ -343,15 +357,15 @@ def search():
 
     keyword = request.args.get("keyword", "")
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
         SELECT *
         FROM transactions
-        WHERE user_id=?
-        AND category LIKE ?
+        WHERE user_id=%s
+        AND category ILIKE %s
         ORDER BY id DESC
         """,
         (
@@ -373,7 +387,7 @@ def search():
 @login_required
 def export_excel():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
 
     query = """
         SELECT
@@ -382,7 +396,7 @@ def export_excel():
         category,
         amount
         FROM transactions
-        WHERE user_id=?
+        WHERE user_id=%s
     """
 
     df = pd.read_sql_query(
@@ -409,7 +423,7 @@ def export_excel():
 @login_required
 def monthly_report():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -434,7 +448,7 @@ def monthly_report():
 
         FROM transactions
 
-        WHERE user_id=?
+        WHERE user_id=%s
 
         GROUP BY month
 
@@ -456,7 +470,7 @@ def monthly_report():
 @login_required
 def yearly_report():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -481,7 +495,7 @@ def yearly_report():
 
         FROM transactions
 
-        WHERE user_id=?
+        WHERE user_id=%s
 
         GROUP BY year
 
@@ -504,15 +518,15 @@ def yearly_report():
 @login_required
 def edit(id):
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
         SELECT *
         FROM transactions
-        WHERE id=?
-        AND user_id=?
+        WHERE id=%s
+        AND user_id=%s
         """,
         (
             id,
@@ -536,19 +550,19 @@ def edit(id):
 @login_required
 def update(id):
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
         UPDATE transactions
         SET
-            date=?,
-            type=?,
-            category=?,
-            amount=?
-        WHERE id=?
-        AND user_id=?
+            date=%s,
+            type=%s,
+            category=%s,
+            amount=%s
+        WHERE id=%s
+        AND user_id=%s
         """,
         (
             request.form["date"],
@@ -568,7 +582,7 @@ def update(id):
 @app.route("/users")
 def users():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT id, username FROM users")
@@ -582,7 +596,7 @@ def users():
 @app.route("/debug_users")
 def debug_users():
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT username, password FROM users")
@@ -592,12 +606,30 @@ def debug_users():
 
     return str(data)
 
+@app.route("/test_db")
+def test_db():
+
+    try:
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT NOW()")
+
+        result = cursor.fetchone()
+
+        conn.close()
+
+        return f"Database Connected: {result}"
+
+    except Exception as e:
+
+        return str(e)
+
 # --------------------------
 # START APP
 # --------------------------
 
+init_db()
 if __name__ == "__main__":
-
-    init_db()
-
     app.run(debug=True)
